@@ -1,0 +1,12 @@
+2020-09-15 22:43:39.465  WARN 3023 --- [main] o.s.boot.StartupInfoLogger               : InetAddress.getLocalHost().getHostName() took 5006 milliseconds to respond. Please verify your network configuration (macOS machines may need to add entries to /etc/hosts).
+2020-09-15 22:43:44.473  INFO 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : Starting ReviewerApplicationTests on AppledeMacBook-Pro.local with PID 3023 (started by apple in /Users/apple/Desktop/reviewer)
+2020-09-15 22:43:44.473 DEBUG 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : Running with Spring Boot v2.3.1.RELEASE, Spring v5.2.7.RELEASE
+2020-09-15 22:43:44.474  INFO 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : No active profile set, falling back to default profiles: default
+2020-09-15 22:43:46.051  INFO 3023 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-09-15 22:43:46.406  INFO 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : Started ReviewerApplicationTests in 17.203 seconds (JVM running for 18.132)
+2020-09-15 22:43:46.561 TRACE 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : trace级别日志
+2020-09-15 22:43:46.562 DEBUG 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : debug级别日志
+2020-09-15 22:43:46.563  INFO 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : info级别日志
+2020-09-15 22:43:46.563  WARN 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : warn级别日志
+2020-09-15 22:43:46.563 ERROR 3023 --- [main] c.e.reviewer.ReviewerApplicationTests    : error级别日志
+2020-09-15 22:43:46.589  INFO 3023 --- [SpringContextShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'

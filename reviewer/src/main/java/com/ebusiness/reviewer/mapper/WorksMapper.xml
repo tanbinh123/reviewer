@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebusiness.reviewer.mapper.WorksMapper" >
+    <resultMap id="BaseResultMap" type="com.ebusiness.reviewer.model.Works" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="worksname" property="worksName" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="average_score" property="averageScore" jdbcType="INTEGER" />
+        <result column="total_score" property="totalScore" jdbcType="INTEGER" />
+        <result column="level" property="level" jdbcType="INTEGER" />
+        <result column="group_id" property="groupId" jdbcType="INTEGER" />
+        <result column="competition_id" property="competitionId" jdbcType="INTEGER" />
+        <result column="start_check" property="startCheck" jdbcType="VARCHAR" />
+        <result column="check_end" property="checkEnd" jdbcType="VARCHAR" />
+        <result column="total_level" property="totalLevel" jdbcType="INTEGER" />
+        <result column="reviewers_num" property="reviewersNum" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="mymap1" type="com.ebusiness.reviewer.model.Works" extends="BaseResultMap">
+        <association property="users" javaType="com.ebusiness.reviewer.model.Users">
+            <result column="uid" property="id"/>
+            <result column="username" property="username"/>
+            <result column="phone" property="phone"/>
+        </association>
+
+
+        <association property="competition" javaType="com.ebusiness.reviewer.model.Competition">
+            <result column="cid" property="id"/>
+            <result column="cname" property="cname"/>
+            <result column="endtime" property="endTime"/>
+        </association>
+        <association property="group" javaType="com.ebusiness.reviewer.model.Group">
+            <result column="gid" property="id"/>
+            <result column="gname" property="groupName"/>
+        </association>
+        <collection property="images" ofType="com.ebusiness.reviewer.model.Image">
+            <id column="iid" property="id"/>
+            <result column="photo" property="photo"/>
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="mymap2" type="com.ebusiness.reviewer.model.Works" extends="BaseResultMap">
+        <collection property="images" ofType="com.ebusiness.reviewer.model.Image">
+            <id column="iid" property="id"/>
+            <result column="photo" property="photo"/>
+        </collection>
+    </resultMap>
+    <select id="getWorksListByPage" resultMap="mymap1">
+        select w.*,u.id as uid,u.username as username ,u.phone as phone,c.id as cid,c.c_name as cname,c.end_time as endtime,g.id as gid,g.group_name as gname
+ from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where c.isenable = '可用'
+        <if test="keyWords !=null">
+            and g.group_name like concat('%',#{keyWords},'%')
+        </if>
+        order by w.average_score desc
+        <if test="page !=null and size !=null">
+            limit #{page},#{size}
+        </if>
+    </select>
+
+    <update id="updateGroup">
+        update works set group_id = #{groupId} where id =#{worksId}
+    </update>
+
+
+    <select id="getWorksTotal" resultType="int" parameterType="String">
+        select COUNT(*)
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where c.isenable = '可用'
+        <if test="keyWords !=null">
+            and g.group_name like concat('%',#{keyWords},'%')
+        </if>
+
+    </select>
+
+    <select id="getScoreListTotal" parameterType="String" resultType="int">
+        select COUNT(*)
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where c.isenable = '可用' and w.check_end = '已结束'
+        <if test="keyWords !=null">
+            and u.username like concat('%',#{keyWords},'%')
+        </if>
+    </select>
+    <select id="getScoreListByPage" resultMap="mymap1">
+        select w.*,u.id as uid,u.username as username ,u.phone as phone,c.id as cid,c.c_name as cname,c.end_time as endtime,g.id as gid,g.group_name as gname
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where c.isenable = '可用' and  w.check_end = '已结束'
+        <if test="keyWords !=null">
+            and u.username like concat('%',#{keyWords},'%')
+        </if>
+        order by w.average_score desc
+        <if test="page !=null and size !=null">
+            limit #{page},#{size}
+        </if>
+    </select>
+    <select id="check" resultType="int">
+        select count(*) from works where user_id = #{userId} and competition_id = #{competitionId}
+    </select>
+    <insert id="insertWorks" parameterType="com.ebusiness.reviewer.model.Works">
+        insert into works (id,worksname,user_id,create_time,competition_id,start_check,check_end,group_id)
+        values (default ,#{worksName},#{userId},NOW(),#{competitionId},'未开始','未结束',#{groupId})
+    </insert>
+    <select id="getWorksId" parameterType="com.ebusiness.reviewer.model.Works" resultType="int">
+        select id  from works where user_id = #{userId} and competition_id =#{competitionId}
+    </select>
+    <update id="changeStartCheck" parameterType="int">
+        update works set start_check = '开始' where id =#{id}
+    </update>
+
+    <select id="getCheckWorksTotal" parameterType="String" resultType="int">
+        select COUNT(*)
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where w.start_check = '开始' and c.isenable = '可用'
+        <if test="keyWords !=null">
+            and g.group_name like concat('%',#{keyWords},'%')
+        </if>
+    </select>
+    <select id="getCheckWorksByPage" resultMap="mymap1">
+        select w.*,u.id as uid,u.username as username ,u.phone as phone,c.id as cid,c.c_name as cname,c.end_time as endtime,g.id as gid,g.group_name as gname
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        where w.start_check = '开始' and w.group_id = #{groupId} and c.isenable = '可用'
+        <if test="keyWords !=null">
+            and w.worksname like concat('%',#{keyWords},'%')
+        </if>
+        order by w.create_time desc
+        <if test="page !=null and size !=null">
+            limit #{page},#{size}
+        </if>
+    </select>
+
+    <select id="getWorksDetail" parameterType="int" resultMap="mymap2">
+        select w.*,i.id as iid,i.photo as photo from works w LEFT OUTER JOIN image i on w.id = i.works_id where w.id = #{id}
+    </select>
+    <update id="scoring" parameterType="com.ebusiness.reviewer.model.Works">
+        update works set total_score = total_score + #{totalScore},total_level =  total_level + #{totalLevel},
+        reviewers_num =reviewers_num + 1
+        where id = #{id}
+    </update>
+    <update id="endCompetitionById" parameterType="int" >
+        update  works set check_end = '已结束'
+        where reviewers_num !=0 and start_check = '开始' and competition_id = #{competitionId}
+    </update>
+    <update id="computeScore" parameterType="int">
+        update   works set average_score = total_score/reviewers_num where check_end = '已结束'
+        and competition_id = #{competitionId}
+    </update>
+    <update id="computeLevel" parameterType="int">
+        update   works set `level` = total_level/reviewers_num where check_end = '已结束'
+          and competition_id = #{competitionId}
+    </update>
+
+    <select id="getMyWorks" resultMap="mymap1" resultType="int">
+        select w.*,u.id as uid,u.username as username ,u.phone as phone,c.id as cid,c.c_name as cname,c.end_time as endtime,g.id as gid,g.group_name as gname,i.id as iid,i.photo as photo
+        from works w LEFT OUTER JOIN users u ON w.user_id = u.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN `group` g on w.group_id = g.id
+        LEFT OUTER JOIN image i on w.id = i.works_id where  w.user_id = #{userId} and c.isenable = '可用'
+    </select>
+
+
+</mapper>

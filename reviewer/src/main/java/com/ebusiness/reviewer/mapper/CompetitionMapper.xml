@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebusiness.reviewer.mapper.CompetitionMapper" >
+    <resultMap id="BaseResultMap" type="com.ebusiness.reviewer.model.Competition" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="c_name" property="cname" jdbcType="VARCHAR" />
+        <result column="start_time" property="startTime" jdbcType="VARCHAR" />
+        <result column="end_time" property="endTime" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="isenable" property="isenable" jdbcType="VARCHAR" />
+        <result column="check_time" property="checkTime" jdbcType="VARCHAR" />
+        <result column="process" property="process" jdbcType="VARCHAR" />
+    </resultMap>
+
+<!--    <insert id="createCompetition" parameterType="com.ebusiness.reviewer.model.Competition">-->
+<!--        insert  into competition  (id,c_name,start_time,end_time,create_time,isenable,process)-->
+<!--        values (default ,#{cname},#{startTime},#{endTime},NOW(),'可用',#{process})-->
+<!--    </insert>-->
+    <select id="getCompetitionList" resultMap="BaseResultMap">
+        select * from competition where isenable = '可用'
+    </select>
+    <select id="getMyJoinCompetition" parameterType="int" resultMap="BaseResultMap">
+        select c.* from  users u,user_competition uc ,competition c
+        where u.id = uc.user_id and uc.competition_id = c.id and  u.id = #{id} and c.isenable = '可用'
+    </select>
+    <update id="closeCompetitionById" parameterType="int">
+        update competition set isenable = '不可用' where id = #{competitionId}
+    </update>
+
+    <insert id="createCompetition" parameterType="com.ebusiness.reviewer.model.Competition">
+
+    <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+        SELECT uuid()
+    </selectKey>
+    insert into
+    competition
+    (id,c_name,start_time,end_time,create_time,isenable,process)
+    values
+    (#{id},#{cname},#{startTime},#{endTime},NOW(),'可用',#{process})
+    </insert>
+</mapper>

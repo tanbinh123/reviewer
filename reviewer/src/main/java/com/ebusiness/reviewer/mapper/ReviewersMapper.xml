@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebusiness.reviewer.mapper.ReviewersMapper" >
+    <resultMap id="BaseResultMap" type="com.ebusiness.reviewer.model.Reviewers" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="headphoto" property="headphoto" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="isenable" property="isenable" jdbcType="VARCHAR" />
+        <result column="group_id" property="groupId" jdbcType="INTEGER" />
+        <result column="position" property="position" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="mymap1" type="com.ebusiness.reviewer.model.Reviewers" extends="BaseResultMap">
+        <association property="group" javaType="com.ebusiness.reviewer.model.Group">
+            <result column="gid" property="id"/>
+            <result column="gname" property="groupName"/>
+        </association>
+    </resultMap>
+    <select id="reviewerLogin" resultMap="BaseResultMap">
+      select * from reviewers where phone = #{phone} and password = #{password}
+    </select>
+    <select id="getReviewersList" resultMap="mymap1">
+             select r.*,g.id as gid,g.group_name as gname from reviewers r
+             LEFT OUTER JOIN `group` g on r.group_id = g.id
+    </select>
+
+    <update id="changeInEnable">
+        update reviewers set isenable = #{isenable} where id = #{id}
+    </update>
+    <update id="updateGroup">
+        update reviewers set group_id = #{groupId} where id = #{reviewerId}
+    </update>
+    <update id="changeMassage" parameterType="com.ebusiness.reviewer.model.Reviewers">
+        update reviewers set username = #{username}, email = #{email},address = #{address},password = #{password} where id = #{id}
+    </update>
+</mapper>

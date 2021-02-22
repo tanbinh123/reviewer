@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebusiness.reviewer.mapper.UsersMapper" >
+    <resultMap id="BaseResultMap" type="com.ebusiness.reviewer.model.Users" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="headphoto" property="headphoto" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="isenable" property="isenable" jdbcType="VARCHAR" />
+        <result column="competition_id" property="competitionId" jdbcType="INTEGER" />
+        <result column="position" property="position" jdbcType="VARCHAR" />
+        <result column="question" property="question" jdbcType="VARCHAR" />
+        <result column="answer" property="answer" jdbcType="VARCHAR" />
+    </resultMap>
+    <insert id="register" parameterType="com.ebusiness.reviewer.model.Users">
+        insert  into users (id,username,password,phone,email,create_time,isenable,position,question,answer)
+        values (default ,#{username},#{password},#{phone},#{email},NOW(),'可用','学生',#{question},#{answer})
+    </insert>
+    <update id="changeInEnable">
+        update users set isenable = #{isenable} where id = #{id}
+    </update>
+    <update id="updatePassword" parameterType="com.ebusiness.reviewer.model.Users">
+        update users set password = #{password} where phone = #{phone}
+    </update>
+
+    <select id="getUsersTotal" parameterType="String" resultType="int">
+        select count(*) from users where 1=1
+        <if test="keyWords !=null">
+            and username like concat('%',#{keyWords},'%')
+        </if>
+    </select>
+
+    <select id="getUsersListByPage" resultMap="BaseResultMap">
+        select * from users where 1=1
+        <if test="keyWords !=null">
+            and username like concat('%',#{keyWords},'%')
+        </if>
+        order by create_time desc
+        <if test="page !=null and size !=null">
+            limit #{page},#{size}
+        </if>
+    </select>
+    <update id="changeMassage" parameterType="com.ebusiness.reviewer.model.Users">
+        update users set username = #{username}, email = #{email},address = #{address},password = #{password} where id = #{id}
+    </update>
+</mapper>

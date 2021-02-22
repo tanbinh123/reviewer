@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ebusiness.reviewer.mapper.ScoringMapper" >
+    <resultMap id="BaseResultMap" type="com.ebusiness.reviewer.model.Scoring" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="reviewer_id" property="reviewerId" jdbcType="INTEGER" />
+        <result column="work_id" property="workId" jdbcType="INTEGER" />
+        <result column="score" property="score" jdbcType="INTEGER" />
+        <result column="score_times" property="scoreTimes" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="mymap1" type="com.ebusiness.reviewer.model.Scoring" extends="BaseResultMap">
+        <association property="reviewer" javaType="com.ebusiness.reviewer.model.Reviewers">
+            <result column="username" property="username"/>
+            <result column="phone" property="phone"/>
+            <result column="email" property="email"/>
+        </association>
+        <association property="works" javaType="com.ebusiness.reviewer.model.Works">
+            <result column="worksname"  property="worksName"/>
+            <association property="competition" javaType="com.ebusiness.reviewer.model.Competition">
+                <result column="c_name" property="cname"/>
+            </association>
+        </association>
+
+    </resultMap>
+    <select id="check" resultType="int">
+        select count(*) from scoring where reviewer_id=#{reviewerId} and work_id=#{workId}
+    </select>
+
+    <update id="updateScoringRecord" parameterType="com.ebusiness.reviewer.model.Scoring">
+        update scoring set score = score + #{score}, score_times = score_times + 1
+        where reviewer_id=#{reviewerId} and work_id=#{workId}
+    </update>
+    <insert id="insertScoringRecord" parameterType="com.ebusiness.reviewer.model.Scoring">
+        insert  into scoring  (id,reviewer_id,work_id,score,score_times,create_time)
+        values (default ,#{reviewerId},#{workId},#{score},1,NOW())
+    </insert>
+
+    <select id="getScoringRecords" resultMap="mymap1">
+       select s.*,w.worksname as worksname,r.username as username,r.phone as phone,r.email as email ,c.c_name from scoring s LEFT OUTER JOIN works w on s.work_id = w.id LEFT OUTER JOIN competition c on w.competition_id = c.id LEFT OUTER JOIN reviewers r on s.reviewer_id =  r.id
+where   w.check_end = '已结束' and c.isenable = '可用'  order by w.average_score desc
+    </select>
+</mapper>
